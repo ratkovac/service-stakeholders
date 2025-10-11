@@ -1,7 +1,9 @@
 package com.stakeholders.service;
 
 import com.stakeholders.model.User;
+import com.stakeholders.model.UserProfile;
 import com.stakeholders.model.UserRole;
+import com.stakeholders.repository.UserProfileRepository;
 import com.stakeholders.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,13 @@ import java.util.Optional;
 public class UserService {
     
     private final UserRepository userRepository;
-    
+    private final UserProfileRepository userProfileRepository;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserProfileRepository userProfileRepository) {
+
         this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
     }
     
     public List<User> getAllUsers() {
@@ -81,6 +86,33 @@ public class UserService {
         List<User> users = userRepository.findByBlocked(false);
         users.forEach(user -> user.setPassword(null));
         return users;
+    }
+
+    public Optional<UserProfile> getUserProfile(Long userId) {
+        return userProfileRepository.findByUserId(userId);
+    }
+
+    public UserProfile createOrUpdateUserProfile(Long userId, String firstName, String lastName, String profilePicture, String biography, String motto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        Optional<UserProfile> existingProfile = userProfileRepository.findByUserId(userId);
+
+        UserProfile profile;
+        if (existingProfile.isPresent()) {
+            profile = existingProfile.get();
+        } else {
+            profile = new UserProfile();
+            profile.setUser(user);
+        }
+
+        profile.setFirstName(firstName);
+        profile.setLastName(lastName);
+        profile.setProfilePicture(profilePicture);
+        profile.setBiography(biography);
+        profile.setMotto(motto);
+
+        return userProfileRepository.save(profile);
     }
 }
 

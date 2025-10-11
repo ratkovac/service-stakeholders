@@ -1,9 +1,11 @@
 package com.stakeholders.controller;
 
 import com.stakeholders.model.User;
+import com.stakeholders.model.UserProfile;
 import com.stakeholders.model.UserRole;
 import com.stakeholders.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/admin/users")
+@RequestMapping("/users")
 @CrossOrigin(origins = "*")
 public class UserController {
     
@@ -78,6 +80,30 @@ public class UserController {
     public ResponseEntity<List<User>> getActiveUsers() {
         List<User> users = userService.getActiveUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<UserProfile> getUserProfile(@PathVariable Long userId) {
+        Optional<UserProfile> userProfile = userService.getUserProfile(userId);
+        return userProfile.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/profile/{userId}")
+    public ResponseEntity<UserProfile> createOrUpdateUserProfile(@PathVariable Long userId, @RequestBody UserProfile profileDetails) {
+        try {
+            UserProfile updatedProfile = userService.createOrUpdateUserProfile(
+                    userId,
+                    profileDetails.getFirstName(),
+                    profileDetails.getLastName(),
+                    profileDetails.getProfilePicture(),
+                    profileDetails.getBiography(),
+                    profileDetails.getMotto()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(updatedProfile);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }
 
