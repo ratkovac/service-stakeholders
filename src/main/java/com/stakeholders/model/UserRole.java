@@ -1,8 +1,8 @@
 package com.stakeholders.model;
 
 public enum UserRole {
-    ADMINISTRATOR,
-    VODIC,
-    TURISTA
+    ROLE_ADMIN,
+    ROLE_GUIDE,
+    ROLE_TOURIST
 }
 
