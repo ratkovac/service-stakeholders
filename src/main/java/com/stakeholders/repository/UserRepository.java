@@ -22,3 +22,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRoleAndBlocked(UserRole role, boolean blocked);
 }
 
+
