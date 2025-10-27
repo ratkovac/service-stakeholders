@@ -45,6 +45,11 @@ public class AuthService {
     public String login(LoginRequest loginRequest) {
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Korisnik nije pronađen: " + loginRequest.getUsername()));
+        
+        if (user.isBlocked()) {
+            throw new RuntimeException("Vaš nalog je blokiran. Molimo kontaktirajte administratora.");
+        }
+        
         if (!loginRequest.getPassword().equals(user.getPassword())) {
             throw new RuntimeException("Pogrešna lozinka.");
         }
