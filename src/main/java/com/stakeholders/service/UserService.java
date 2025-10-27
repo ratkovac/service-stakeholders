@@ -92,7 +92,7 @@ public class UserService {
         return userProfileRepository.findByUserId(userId);
     }
 
-    public UserProfile createOrUpdateUserProfile(Long userId, String firstName, String lastName, String profilePicture, String biography, String motto) {
+    public UserProfile createOrUpdateUserProfile(Long userId, String firstName, String lastName, String profilePictureUrl, String biography, String motto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
@@ -108,7 +108,7 @@ public class UserService {
 
         profile.setFirstName(firstName);
         profile.setLastName(lastName);
-        profile.setProfilePicture(profilePicture);
+        profile.setProfilePicture(profilePictureUrl);
         profile.setBiography(biography);
         profile.setMotto(motto);
 

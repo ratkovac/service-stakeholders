@@ -8,9 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -18,10 +24,16 @@ import java.util.Optional;
 public class UserController {
     
     private final UserService userService;
-    
+    private static final String UPLOAD_DIR = "uploads/profile-pictures/";
+
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+        try {
+            Files.createDirectories(Paths.get(UPLOAD_DIR));
+        } catch (IOException e) {
+            System.err.println("Failed to create upload directory: " + e.getMessage());
+        }
     }
     
     @GetMapping
@@ -96,13 +108,48 @@ public class UserController {
                     userId,
                     profileDetails.getFirstName(),
                     profileDetails.getLastName(),
-                    profileDetails.getProfilePicture(),
+                    profileDetails.getProfilePicture(), // Ovo će sada biti URL
                     profileDetails.getBiography(),
                     profileDetails.getMotto()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(updatedProfile);
         } catch (RuntimeException e) {
+            // Logovati e.getMessage() za bolji uvid
+            System.err.println("Error creating or updating user profile: " + e.getMessage());
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/profile/{userId}/upload-picture")
+    public ResponseEntity<String> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please select a file to upload.");
+        }
+
+        try {
+            // Generisanje jedinstvenog imena fajla
+            String originalFileName = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFileName != null && originalFileName.contains(".")) {
+                fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            }
+            String newFileName = UUID.randomUUID().toString() + fileExtension;
+
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path filePath = uploadPath.resolve(newFileName);
+
+            Files.copy(file.getInputStream(), filePath);
+
+            // Vrati relativnu putanju/URL do slike
+            // Važno: Ovu putanju će front-end koristiti za prikaz,
+            // a backend će je čuvati u bazi.
+            // Morate obezbediti da je 'uploads/profile-pictures/' dostupna putem HTTP-a (npr. preko Spring Boot static resource handlera)
+            String imageUrl = "/uploads/profile-pictures/" + newFileName;
+            return ResponseEntity.ok(imageUrl);
+
+        } catch (IOException e) {
+            System.err.println("Failed to upload file: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.");
         }
     }
 }

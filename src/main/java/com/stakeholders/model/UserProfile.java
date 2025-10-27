@@ -16,6 +16,8 @@ public class UserProfile {
 
     private String firstName;
     private String lastName;
+
+    @Column(columnDefinition = "TEXT")
     private String profilePicture;
     @Column(length = 1000)
     private String biography;
