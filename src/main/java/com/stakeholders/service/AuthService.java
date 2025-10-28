@@ -3,7 +3,6 @@ package com.stakeholders.service;
 
 import com.stakeholders.dto.LoginRequest;
 import com.stakeholders.dto.ValidationResponse;
-import com.stakeholders.events.UserEventPublisher;
 import com.stakeholders.model.User;
 import com.stakeholders.repository.UserRepository;
 import com.stakeholders.util.JwtUtil;
@@ -21,14 +20,11 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final UserEventPublisher userEventPublisher;
-
 
     @Autowired
-    public AuthService(UserRepository userRepository, JwtUtil jwtUtil, UserEventPublisher userEventPublisher) {
+    public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
-        this.userEventPublisher = userEventPublisher;
     }
 
     public User registerUser(User user) {
@@ -37,8 +33,6 @@ public class AuthService {
         }
 
         user = userRepository.save(user);
-        //userEventPublisher.publishUserCreatedEvent(user.getId());
-
         return user;
     }
 
