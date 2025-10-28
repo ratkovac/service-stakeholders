@@ -7,6 +7,7 @@ import com.stakeholders.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class UserController {
     
     private final UserService userService;
@@ -120,12 +121,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/profile/{userId}/upload-picture")
+    @PostMapping("/profile/upload-picture/{userId}")
     public ResponseEntity<String> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Please select a file to upload.");
         }
-
+        System.out.println("Radi slika1");
         try {
             // Generisanje jedinstvenog imena fajla
             String originalFileName = file.getOriginalFilename();
@@ -139,6 +140,7 @@ public class UserController {
             Path filePath = uploadPath.resolve(newFileName);
 
             Files.copy(file.getInputStream(), filePath);
+            System.out.println("Radi slika2");
 
             // Vrati relativnu putanju/URL do slike
             // Važno: Ovu putanju će front-end koristiti za prikaz,
