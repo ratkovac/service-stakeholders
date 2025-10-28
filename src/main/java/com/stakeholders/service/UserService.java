@@ -25,25 +25,15 @@ public class UserService {
     }
     
     public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        users.forEach(user -> user.setPassword(null));
-        return users;
+        return userRepository.findAll();
     }
     
     public Optional<User> getUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            user.get().setPassword(null);
-        }
-        return user;
+        return userRepository.findById(id);
     }
     
     public Optional<User> getUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            user.get().setPassword(null);
-        }
-        return user;
+        return userRepository.findByUsername(username);
     }
     
     public User blockUser(Long userId) {
@@ -55,9 +45,7 @@ public class UserService {
         }
         
         user.setBlocked(true);
-        User savedUser = userRepository.save(user);
-        savedUser.setPassword(null);
-        return savedUser;
+        return userRepository.save(user);
     }
     
     public User unblockUser(Long userId) {
@@ -65,27 +53,19 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
         user.setBlocked(false);
-        User savedUser = userRepository.save(user);
-        savedUser.setPassword(null);
-        return savedUser;
+        return userRepository.save(user);
     }
     
     public List<User> getUsersByRole(UserRole role) {
-        List<User> users = userRepository.findByRole(role);
-        users.forEach(user -> user.setPassword(null));
-        return users;
+        return userRepository.findByRole(role);
     }
     
     public List<User> getBlockedUsers() {
-        List<User> users = userRepository.findByBlocked(true);
-        users.forEach(user -> user.setPassword(null));
-        return users;
+        return userRepository.findByBlocked(true);
     }
     
     public List<User> getActiveUsers() {
-        List<User> users = userRepository.findByBlocked(false);
-        users.forEach(user -> user.setPassword(null));
-        return users;
+        return userRepository.findByBlocked(false);
     }
 
     public Optional<UserProfile> getUserProfile(Long userId) {

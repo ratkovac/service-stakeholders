@@ -36,9 +36,22 @@ public class UserController {
             System.err.println("Failed to create upload directory: " + e.getMessage());
         }
     }
+
+    private boolean isAdmin(String username) {
+        if (username == null) return false;
+        // In a real implementation, you would check the user's role from database
+        // For now, return true if user exists (this should be improved)
+        return userService.getUserByUsername(username)
+            .map(user -> user.getRole().equals(UserRole.ROLE_ADMIN))
+            .orElse(false);
+    }
     
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@RequestHeader(value = "X-Username", required = false) String username) {
+        if (username == null || !isAdmin(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Samo administratori mogu pristupiti ovoj funkciji");
+        }
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
@@ -58,7 +71,12 @@ public class UserController {
     }
     
     @PutMapping("/{id}/block")
-    public ResponseEntity<?> blockUser(@PathVariable Long id) {
+    public ResponseEntity<?> blockUser(@PathVariable Long id, 
+                                      @RequestHeader(value = "X-Username", required = false) String username) {
+        if (username == null || !isAdmin(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Samo administratori mogu pristupiti ovoj funkciji");
+        }
         try {
             User user = userService.blockUser(id);
             return ResponseEntity.ok(user);
@@ -68,7 +86,12 @@ public class UserController {
     }
     
     @PutMapping("/{id}/unblock")
-    public ResponseEntity<?> unblockUser(@PathVariable Long id) {
+    public ResponseEntity<?> unblockUser(@PathVariable Long id, 
+                                         @RequestHeader(value = "X-Username", required = false) String username) {
+        if (username == null || !isAdmin(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Samo administratori mogu pristupiti ovoj funkciji");
+        }
         try {
             User user = userService.unblockUser(id);
             return ResponseEntity.ok(user);
