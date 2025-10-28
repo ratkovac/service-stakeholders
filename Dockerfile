@@ -10,6 +10,6 @@ COPY ${JAR_FILE} app.jar
 EXPOSE 8081
 
 # gRPC Server port
-EXPOSE 9091
+EXPOSE 9094
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
