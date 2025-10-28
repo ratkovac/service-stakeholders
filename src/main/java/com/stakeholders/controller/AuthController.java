@@ -4,6 +4,7 @@ import com.stakeholders.dto.LoginRequest;
 import com.stakeholders.dto.LoginResponse;
 import com.stakeholders.dto.ValidationResponse;
 import com.stakeholders.model.User;
+import com.stakeholders.model.UserProfile;
 import com.stakeholders.service.AuthService;
 import com.stakeholders.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +17,19 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         try {
             User registeredUser = authService.registerUser(user);
+            userService.createOrUpdateUserProfile(registeredUser.getId(), "", "", "/uploads/profile-pictures/user.png", "", "");
             return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

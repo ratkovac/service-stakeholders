@@ -27,7 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-
+                        .requestMatchers("/uploads/profile-pictures/**").permitAll() // Pazi na putanju!
                         //.requestMatchers("/test/status").permitAll()
 
                         .anyRequest().authenticated()
