@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/admin/users")
+@RequestMapping("/users")
 public class UserController {
     
     private final UserService userService;
@@ -24,8 +24,6 @@ public class UserController {
 
     private boolean isAdmin(String username) {
         if (username == null) return false;
-        // In a real implementation, you would check the user's role from database
-        // For now, return true if user exists (this should be improved)
         return userService.getUserByUsername(username)
             .map(user -> user.getRole().equals(UserRole.ROLE_ADMIN))
             .orElse(false);
