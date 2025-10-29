@@ -6,6 +6,7 @@ services:
     container_name: stakeholders-app
     ports:
       - "8081:8081"
+      - "9094:9094"  # gRPC Server port
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/stakeholders
       - SPRING_DATASOURCE_USERNAME=postgres
