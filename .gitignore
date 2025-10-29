@@ -129,4 +129,5 @@ local.properties
 .vscode/
 *.code-workspace
 
+.idea/
 # End of https://www.toptal.com/developers/gitignore/api/java,maven,spring,intellij,eclipse,vscode
